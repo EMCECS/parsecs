@@ -11,6 +11,7 @@ OPTIND=1
 # limited to the terms and conditions of the License Agreement under which
 # it is provided by or on behalf of EMC.
 
+
 ### boostrap the environment
 param="${!#}"
 if [ -f /etc/parsecs.conf ]; then

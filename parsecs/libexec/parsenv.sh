@@ -30,13 +30,6 @@ if [[ "$0" == "-bash" ]]; then
     shell_source=true
 fi
 
-if $shell_source; then
-    lfn="$script_logs/parsecs-shell.log"
-else
-    lfn="$(basename $0)"
-    lfn="$script_logs/${bn0%.sh}.log"
-fi
-
 # flow-through defaults
 LOGFILE=${LOGFILE:-"${lfn}"}
 PODNUM=${PODNUM:-''}
@@ -185,10 +178,22 @@ else
             fi
         fi
 
-        # import everything
+        # import config
         source $script_home/parsecs.conf
+
+        # set up logging
+        if $shell_source; then
+            lfn="$script_logs/parsecs-shell.log"
+        else
+            lfn="$(basename $0)"
+            lfn="$script_logs/${bn0%.sh}.log"
+        fi
+        LOGFILE=${LOGFILE:-"${lfn}"}
+
+        # import includes
         source $script_home/lib/includes.sh
 
+        # yell at user
         $shell_source && show_head
         $shell_source && show_warn # warn if pod or rack = 0 (meta-pod/meta-rack)
         $shell_source && $DEBUG && show_vars
