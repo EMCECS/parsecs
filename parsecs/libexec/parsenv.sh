@@ -186,7 +186,7 @@ else
         fi
 
         # import everything
-        source $HOME/parsecs.conf
+        source $script_home/parsecs.conf
         source $script_home/lib/includes.sh
 
         $shell_source && show_head
