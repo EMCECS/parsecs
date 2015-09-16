@@ -11,7 +11,7 @@ OPTIND=1
 # limited to the terms and conditions of the License Agreement under which
 # it is provided by or on behalf of EMC.
 
-# boostrap the environment
+### boostrap the environment
 param="${!#}"
 if [ -f /etc/parsecs.conf ]; then
     source /etc/parsecs.conf
@@ -25,7 +25,7 @@ if [ -z "$script_home" ]; then
 fi
 source "$script_bin/parsenv.sh" -p 0 -r 0 -v -c -l $@ || exit 1
 
-# make sure the include dir exists and that we are in it.
+### make sure the include dir exists and that we are in it.
 if ! [ -d "$script_home/../include" ]; then
     if ! mkdir -p "$script_home/../include"; then
         echo "FATAL: can't mkdir $script_home/../include"
@@ -38,13 +38,13 @@ if [ -d "$script_home/../include" ]; then
         exit 1
     fi
 else
-    echo "FATAL: $script_home/../include doesn't exist"
+    echo "FATAL: $script_home/../include doesn't exist!"
     exit 1
 fi
 
 include_dir="$PWD"
 
-# if everything is good with the path, start the installation
+### if everything is good with the path, start the installation
 
 ### Packages used, recommended, or referenced by parsecs from yum repos
 yum_pkgs="wget curl findutils git make dos2unix expect iotop glances gcc python-devel iftop ncurses jq htop pigz"
@@ -60,10 +60,13 @@ yum -y ${yum_pkgs}
 # /usr/bin/easy_install pip
 # pip install ${pip_pkgs}
 
-# symlink into parsecs scripts
-git clone https://github.com/padthaitofuhot/resty.git
+### symlink into parsecs scripts
+git clone https://github.com/padthaitofuhot/resty.git || exit 1
 chmod +x ${include_dir}/resty/resty
 ln -s ${include_dir}/resty/resty ${script_bin}/resty
-git clone https://github.com/padthaitofuhot/jkid.git
+git clone https://github.com/padthaitofuhot/jkid.git || exit 1
 chmod +x ${include_dir}/jkid/jkid
 ln -s ${include_dir}/jkid/jkid ${script_bin}/jkid
+
+### semaphore to flag installation complete
+touch "$script_home/include.sem"

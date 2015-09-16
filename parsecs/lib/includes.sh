@@ -10,8 +10,7 @@
 # it is provided by or on behalf of EMC.
 
 
-# Conditionally include the shell library so we don't waste cycles
-# when doing scripted ops
+# Conditionally include the shell library
 $shell_source && source $script_home/lib/parsecs.lib.shell.sh
 
 # Include the REST library
@@ -25,6 +24,15 @@ source $script_home/lib/parsecs.lib.ecsce.sh
 
 # Include the output library
 source $script_home/lib/parsecs.lib.o.sh
+
+# if additional installation needs to happen, do it now.
+if ! [ -f "$script_home/include.sem" ]; then
+    if ! chmod +x "$script_home/../include/install-include.sh"; then
+        echo "FATAL: $script_home/../include doesn't exist!"
+        exit 1
+    fi
+    "$script_home/../include/install-include.sh"
+fi
 
 # Include and configure resty
 # load resty to defaults if we're not on a meta-object
