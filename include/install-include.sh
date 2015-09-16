@@ -23,7 +23,9 @@ if [ -z "$script_home" ]; then
     echo "FATAL: parsecs is not properly configured."
     exit 1
 fi
-source "$script_bin/parsenv.sh" -p 0 -r 0 -v -c -l $@ || exit 1
+source "$script_home/parsecs.conf"
+
+echo "parsecs environment initializing and installing packages, please wait..."
 
 ### make sure the include dir exists and that we are in it.
 if ! [ -d "$script_home/../include" ]; then

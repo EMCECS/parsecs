@@ -28,8 +28,8 @@ source $script_home/lib/parsecs.lib.o.sh
 # if additional installation needs to happen, do it now.
 if ! [ -f "$script_home/include.sem" ]; then
     if ! chmod +x "$script_home/../include/install-include.sh"; then
-        echo "FATAL: $script_home/../include doesn't exist!"
-        exit 1
+        echo "FATAL: $script_home/../include doesn't exist! Dropping to shell for manual repair."
+        bash
     fi
     "$script_home/../include/install-include.sh"
 fi
