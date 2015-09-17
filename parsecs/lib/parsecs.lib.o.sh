@@ -16,6 +16,7 @@ shopt -s xpg_echo
 # parsecs output and logging library #
 ######################################
 
+# TODO: refactor logging to use context tokens rather than writing logging context by hand.
 
 _hostname="$(hostname)"
 _logfile="$LOGFILE"
@@ -28,6 +29,7 @@ log_run() {
 }
 
 # generic logger that can take input on stdin or as arguments
+# wires console output into the generic output filter
 log() {
     if [ -z "$*" ]; then
         while read line; do
@@ -96,6 +98,7 @@ die_fatal_error() {
     quit 1
 }
 
+# generic output filter wrapper
 # filters everything on stdin or arguments through the
 # output filter.
 o() {
@@ -109,8 +112,8 @@ o() {
     fi
 }
 
-# evaluate the first tokens of an output string and
-# colorize accordingly.
+# evaluate string as tokens and colorize accordingly.
+# It's surprisingly fast.  For bash.
 output_filter() {
     if $COLORIZE; then
         shopt -s nocasematch
@@ -211,7 +214,9 @@ dangerous_strip_logs() {
     | xargs sed -i -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g"
 }
 
-# Strips color escape sequences from output
+# Strips color escape sequences from output, useful when using with | tee
+# pipes in aggregate operation scripts that trigger actions on several
+# hosts simultaneously over ssh.
 strip_color() {
     while read -r line; do
         builtin echo "$line" | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g"
@@ -231,6 +236,8 @@ prompt_line() {
     done
     builtin echo -n "${color}\E(0$s\E(B${Color_Off}"
 }
+
+### some colors and characters by name
 
 # Reset
 Color_Off='\e[0m'       # Text Reset

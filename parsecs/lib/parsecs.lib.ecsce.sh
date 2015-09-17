@@ -51,6 +51,8 @@ ECS_HOSTNAME=${ECS_HOSTNAME:-"${rack_master[RACKINDEX]}"}
 
 
 ##### ecscli.py wrappers
+# according to the API docs this is available via HTTP GET /cli
+# unsure which version it is or what capabilities/bugs it has.
 #
 
 ecs-cmd() {
@@ -111,7 +113,7 @@ ecs_dt_q_waitloop() {
     fi
 }
 #
-# only when rack = 0 ! TODO: make this not a requirement
+# only when rack = 0 ! TODO: make meta ops work as a wildcard rather than nothing
 wait_for_dt_ready() {
     ecs_dt_q_waitloop "${rack_master[$(( ${RACKINDEX} ))]}"
 }
@@ -130,6 +132,7 @@ die_meta_object() {
 }
 
 # authenticate and return cookiefile path for a given rack number
+# refactored to pure bash 2015-14-09
 ecs-cookiefile() {
 
     local tmp=''
@@ -153,7 +156,10 @@ ecs-cookiefile() {
 
     # IF there is no cookie file OR if there is an empty cookie file OR if the cookie file is older than 60 minutes,
     # THEN let's actually talk to the (potentially very slow) API and try to get a valid cookie.
-    if ( [ ! -f "${COOKIE_FILE}" ] ) || ( [ -f "${COOKIE_FILE}" ] && [ -z "$(<${COOKIE_FILE})" ] ) || ( [ -f "${COOKIE_FILE}" ] && (( $(date +%s -r ${COOKIE_FILE}) < $(date +%s -d "-60 min") )) ); then
+    if ( [ ! -f "${COOKIE_FILE}" ] ) \
+    || ( [ -f "${COOKIE_FILE}" ] && [ -z "$(<${COOKIE_FILE})" ] ) \
+    || ( [ -f "${COOKIE_FILE}" ] && (( $(date +%s -r ${COOKIE_FILE}) < $(date +%s -d "-60 min") )) )
+    then
 
         # if there's a cookiefile, read it and see if there's any contents.
         # if so, try to reauth against the contents.
@@ -195,7 +201,7 @@ ecs-cookiefile() {
                 # if login succeded and we didn't get a cookie in the file, then something weird
                 # happened and we error out.
                 echo "/dev/null"
-                >&2 o "ECS: pod ${PODNUM}: rack ${RACK}: node ${rack_master[${index}]}: login successful, but got no cookie!"
+                >&2 o "ECS: REST: pod ${PODNUM}: rack ${RACK}: node ${rack_master[${index}]}: login successful, but got no cookie!"
                 return 1
             fi
         else
@@ -206,7 +212,7 @@ ecs-cookiefile() {
             # if we were doing password auth and login failed, then the whole thing failed.
             else
                 echo "/dev/null"
-                >&2 o "ECS: pod ${PODNUM}: rack ${RACK}: node ${rack_master[${index}]}: login failed, no cookie for us!"
+                >&2 o "ECS: REST: pod ${PODNUM}: rack ${RACK}: node ${rack_master[${index}]}: login failed, no cookie for us!"
                 return 1
             fi
         fi

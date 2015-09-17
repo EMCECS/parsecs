@@ -50,12 +50,15 @@ include_dir="$PWD"
 ### if everything is good with the path, start the installation
 
 ### Packages used, recommended, or referenced by parsecs from yum repos
-yum_pkgs="wget curl findutils git make dos2unix expect iotop glances gcc python-devel iftop ncurses jq htop pigz"
-yum -y check-update
-yum -y install epel-release
-yum -y check-update
-yum -y upgrade
-yum -y ${yum_pkgs}
+yum_pkgs="wget curl findutils git make deltarpm dos2unix expect iotop glances gcc python-devel iftop ncurses jq htop pigz"
+echo "yum installing epel-release repo"
+yum -y -q install epel-release
+echo "yum updating yum repos"
+yum -y -q check-update
+echo "yum upgrading existing packages"
+yum -y -q upgrade
+echo "yum installing new packages and depends: $yum_pkgs"
+yum -y -q install ${yum_pkgs}
 
 ### Python packages for "new" scripts
 ### not used yet
@@ -64,7 +67,10 @@ yum -y ${yum_pkgs}
 # pip install ${pip_pkgs}
 
 ### symlink into parsecs scripts
-git clone https://github.com/padthaitofuhot/resty.git || exit 1
+git clone -q https://github.com/padthaitofuhot/resty.git || exit 1
+echo "git cloning jkid JSON utility"
+git clone -q https://github.com/padthaitofuhot/jkid.git || exit 1
+echo "building checked-out sources and symlinking into $script_bin"
 chmod +x ${include_dir}/resty/resty
 ln -s ${include_dir}/resty/resty ${script_bin}/resty
 git clone https://github.com/padthaitofuhot/jkid.git || exit 1
@@ -73,3 +79,6 @@ ln -s ${include_dir}/jkid/jkid ${script_bin}/jkid
 
 ### semaphore to flag installation complete
 touch "$script_home/include.sem"
+
+echo "install complete"
+echo "*** YOU SHOULD PROBABLY REBOOT IF KERNEL OR SYSTEMD PACKAGES UPDATED ***"
