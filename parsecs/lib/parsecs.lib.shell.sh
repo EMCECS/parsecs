@@ -54,7 +54,7 @@ rest_get() {
     shift
     slog "REST: node $node: requesting ${@}..."
     rest "$@"
-    GET | tee 2>(o) | jq -C .
+    GET > >(jq -C .) 2> >(o)
     rest
 }
 
