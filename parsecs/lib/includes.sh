@@ -26,7 +26,7 @@ source $script_home/lib/parsecs.lib.ecsce.sh
 source $script_home/lib/parsecs.lib.o.sh
 
 # if additional installation needs to happen, do it now.
-if ! [ -f "$script_home/include.sem" ]; then
+if ! [ -f "$script_home/../include/install-include.sem" ]; then
     if ! chmod +x "$script_home/../include/install-include.sh"; then
         echo "FATAL: $script_home/../include doesn't exist! Dropping to shell for manual repair."
         bash

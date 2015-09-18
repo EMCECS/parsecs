@@ -235,7 +235,7 @@ wait_for_cookie() {
     local result=""
 
     while [ -z "$result" ] && ! (( ( $(date +%s) - seconds ) >= cookie_timeout )); do
-        result=$(ecs-cookiefile $index)
+        result=$(cat $(ecs-cookiefile $index))
         api_waitloop_sleep
     done
 
