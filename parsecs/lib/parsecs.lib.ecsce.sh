@@ -87,8 +87,17 @@ declare -A unready_dt_num
 # get dt qsize, use python to handle the xml, return 1 if any queue
 ecs_dt_q() {
     local node="$1"
+    local diagsvcout=''
     unready_dt_num[$node]=1
-    unready_dt_num[$node]=$(python -c "import os, xml.etree.ElementTree as ET; print ET.fromstring('$(curl -sq -m $api_timeout http://$node:9101/stats/dt/DTInitStat/)').find('entry').find('unready_dt_num').text") || return 1 # XML oneliner, NOH8M8
+
+    if diagsvcout=$(curl -sq -m $api_timeout http://$node:9101/stats/dt/DTInitStat/); then
+        if ! unready_dt_num[$node]=$(python -c "import os, xml.etree.ElementTree as ET; print ET.fromstring('$diagsvcout').find('entry').find('unready_dt_num').text"); then
+            return 1
+        fi
+    else
+        return 1
+    fi
+
     if (( ${unready_dt_num[$node]} > 0 )); then
         return 1
     else
