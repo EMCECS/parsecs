@@ -51,9 +51,10 @@ rerr() {
 
 rest_get() {
     local node=${rack_master[$RACKINDEX]}
+    local uri=$1
     shift
     slog "REST: node $node: requesting ${@}..."
-    rest "$@"
+    rest "$uri"
     GET > >(jq -C .) 2> >(o)
     rest
 }
@@ -151,8 +152,7 @@ show_ns() {
 }
 
 show_buckets() {
-    shift
-    local namespace="$ce_namespace"
+    local namespace=${1:-"$ce_nsname"}
     local node=${rack_master[$RACKINDEX]}
     slog "REST: node $node: requesting bucket data..."
     rest /object/bucket || return 1
@@ -222,6 +222,7 @@ show () {
         vacap|spcap) show_va_cap;;
         failzones) show_temp_failed_zones;;
         conf|config) show_config;;
+        meta|metadata) show_metadata;;
         lic|license) show_license;;
         cookie) show_cookie;;
         cookiefile) ecs-cookiefile $RACKINDEX;;
